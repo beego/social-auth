@@ -1,0 +1,11 @@
+{
+	"go_install": true,
+	"watch_ext": [],
+	"dir_structure":{
+		"controllers": ".",
+		"models": ".",
+		"others": [
+			"$GOPATH/src/github.com/astaxie/beego"
+		]
+	}
+}
