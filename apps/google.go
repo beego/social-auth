@@ -21,7 +21,7 @@ import (
 
 	"github.com/astaxie/beego/httplib"
 
-	"github.com/beego/social-oauth"
+	"github.com/beego/social-auth"
 )
 
 type Google struct {

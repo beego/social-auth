@@ -18,14 +18,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/context"
-	"github.com/astaxie/beego/orm"
 	"os"
 	"path/filepath"
 
-	"github.com/beego/social-oauth"
-	"github.com/beego/social-oauth/apps"
+	"github.com/astaxie/beego"
+	"github.com/astaxie/beego/context"
+	"github.com/astaxie/beego/orm"
+
+	"github.com/beego/social-auth"
+	"github.com/beego/social-auth/apps"
 )
 
 func IsUserLogin(ctx *context.Context) (int, bool) {
@@ -137,6 +138,7 @@ func (p *socialAuther) IsUserLogin(ctx *context.Context) (int, bool) {
 }
 
 func (p *socialAuther) LoginUser(ctx *context.Context, uid int) (string, error) {
+	// fake login the user
 	if uid == 1 {
 		ctx.Input.CruSession.Set("login_user", 1)
 	}

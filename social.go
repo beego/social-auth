@@ -44,10 +44,12 @@ type SocialAuth struct {
 	ConnectRegisterURL string
 }
 
+// generate session key for social-auth
 func (this *SocialAuth) getSessKey(social SocialType, key string) string {
 	return "social_" + fmt.Sprintf("%v", social) + "_" + key
 }
 
+// create oauth2 state string
 func (this *SocialAuth) createState(ctx *context.Context, social SocialType) string {
 	values := make(url.Values, 2)
 
@@ -69,6 +71,7 @@ func (this *SocialAuth) createState(ctx *context.Context, social SocialType) str
 	return state
 }
 
+// verify oauth2 state string
 func (this *SocialAuth) verifyState(ctx *context.Context, social SocialType) (string, bool) {
 	code := ctx.Input.Query("code")
 	state := ctx.Input.Query("state")
@@ -87,6 +90,7 @@ func (this *SocialAuth) verifyState(ctx *context.Context, social SocialType) (st
 	return code, true
 }
 
+// check if uid of socialType is exist
 func (this *SocialAuth) HasConnected(uid int, social SocialType) (*UserSocial, bool) {
 	var userSocial UserSocial
 	if UserSocials().Filter("Uid", uid).Filter("Type", social).One(&userSocial) == nil {
@@ -95,6 +99,7 @@ func (this *SocialAuth) HasConnected(uid int, social SocialType) (*UserSocial, b
 	return nil, false
 }
 
+// Get provider according request path. ex: /login/: match /login/github
 func (this *SocialAuth) getProvider(ctx *context.Context) Provider {
 	path := ctx.Input.Param(":")
 

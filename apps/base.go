@@ -21,7 +21,8 @@ import (
 	"fmt"
 
 	"github.com/astaxie/beego/orm"
-	"github.com/beego/social-oauth"
+
+	"github.com/beego/social-auth"
 )
 
 type BaseProvider struct {
