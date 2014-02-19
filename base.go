@@ -23,6 +23,7 @@ import (
 var providers = make(map[SocialType]Provider)
 var providersByPath = make(map[string]Provider)
 
+// Register the social provider
 func RegisterProvider(prov Provider) error {
 	typ := prov.GetType()
 	if !typ.Available() {
@@ -37,6 +38,7 @@ func RegisterProvider(prov Provider) error {
 	return nil
 }
 
+// Get provider by SocialType
 func GetProviderByType(typ SocialType) (Provider, bool) {
 	if p, ok := providers[typ]; ok {
 		return p, true
@@ -45,6 +47,7 @@ func GetProviderByType(typ SocialType) (Provider, bool) {
 	}
 }
 
+// Get provider by path name
 func GetProviderByPath(path string) (Provider, bool) {
 	if p, ok := providersByPath[path]; ok {
 		return p, true

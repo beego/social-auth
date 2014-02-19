@@ -147,14 +147,21 @@ func (p *socialAuther) LoginUser(ctx *context.Context, uid int) (string, error) 
 
 var SocialAuth *social.SocialAuth
 
-func init() {
+func initialize() {
+	var err error
+
 	// setting beego orm
-	orm.RegisterDataBase("default", "mysql", "root:root@/social_test?loc=Asia%2FShanghai")
-	orm.RunSyncdb("default", false, false)
+	err = orm.RegisterDataBase("default", "mysql", beego.AppConfig.String("orm_source"))
+	if err != nil {
+		beego.Error(err)
+	}
+	err = orm.RunSyncdb("default", false, false)
+	if err != nil {
+		beego.Error(err)
+	}
 
 	// OAuth
 	var clientId, secret string
-	var err error
 
 	url := beego.AppConfig.String("social_auth_url")
 	if len(url) > 0 {
@@ -182,6 +189,8 @@ func init() {
 }
 
 func main() {
+	initialize()
+
 	// must enable session engine, default use memory as engine
 	beego.SessionOn = true
 	beego.SessionProvider = "file"

@@ -12,6 +12,8 @@
 // License for the specific language governing permissions and limitations
 // under the License.
 //
+// modified from https://code.google.com/p/goauth2/source/browse/oauth/oauth.go
+//
 // Maintain by https://github.com/slene
 
 package social

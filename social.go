@@ -111,6 +111,7 @@ func (this *SocialAuth) getProvider(ctx *context.Context) Provider {
 	return nil
 }
 
+// After OAuthAccess check saved token for ready connect
 func (this *SocialAuth) ReadyConnect(ctx *context.Context) (SocialType, bool) {
 	var social SocialType
 
@@ -127,6 +128,7 @@ func (this *SocialAuth) ReadyConnect(ctx *context.Context) (SocialType, bool) {
 	return social, true
 }
 
+// Redirect to other social platform
 func (this *SocialAuth) OAuthRedirect(ctx *context.Context) (redirect string, failedErr error) {
 	_, isLogin := this.app.IsUserLogin(ctx)
 
@@ -148,10 +150,12 @@ func (this *SocialAuth) OAuthRedirect(ctx *context.Context) (redirect string, fa
 
 	social := p.GetType()
 	config := p.GetConfig()
+	// create redirect url
 	redirect = config.AuthCodeURL(this.createState(ctx, social))
 	return
 }
 
+// Callback from social platform
 func (this *SocialAuth) OAuthAccess(ctx *context.Context) (redirect string, userSocial *UserSocial, failedErr error) {
 	_, isLogin := this.app.IsUserLogin(ctx)
 
@@ -167,11 +171,13 @@ func (this *SocialAuth) OAuthAccess(ctx *context.Context) (redirect string, user
 		}
 	}()
 
+	// check if param has a error key
 	if err := ctx.Input.Query("error"); len(err) > 0 {
 		failedErr = fmt.Errorf(err)
 		return
 	}
 
+	// get provider from matched url path
 	var p Provider
 	if p = this.getProvider(ctx); p == nil {
 		failedErr = fmt.Errorf("unknown provider")
@@ -182,6 +188,7 @@ func (this *SocialAuth) OAuthAccess(ctx *context.Context) (redirect string, user
 
 	var code string
 
+	// verify state string
 	if c, ok := this.verifyState(ctx, social); !ok {
 		failedErr = fmt.Errorf("state not verified")
 		return
@@ -192,6 +199,7 @@ func (this *SocialAuth) OAuthAccess(ctx *context.Context) (redirect string, user
 	config := p.GetConfig()
 	trans := &Transport{config, nil, nil}
 
+	// Send code to platform then get token
 	if tok, err := trans.Exchange(code); err != nil {
 		// get access token
 		failedErr = err
@@ -236,6 +244,7 @@ func (this *SocialAuth) OAuthAccess(ctx *context.Context) (redirect string, user
 	return
 }
 
+// general use of redirect
 func (this *SocialAuth) handleRedirect(ctx *context.Context) {
 	redirect, err := this.OAuthRedirect(ctx)
 	if err != nil {
@@ -247,6 +256,7 @@ func (this *SocialAuth) handleRedirect(ctx *context.Context) {
 	}
 }
 
+// general use of redirect callback
 func (this *SocialAuth) handleAccess(ctx *context.Context) {
 	redirect, _, err := this.OAuthAccess(ctx)
 	if err != nil {
@@ -258,6 +268,7 @@ func (this *SocialAuth) handleAccess(ctx *context.Context) {
 	}
 }
 
+// save user social info and login the user
 func (this *SocialAuth) ConnectAndLogin(ctx *context.Context, socialType SocialType, uid int) (string, *UserSocial, error) {
 	tokKey := this.getSessKey(socialType, "token")
 
@@ -306,6 +317,7 @@ func (this *SocialAuth) ConnectAndLogin(ctx *context.Context, socialType SocialT
 	return loginRedirect, &userSocial, nil
 }
 
+// create a global SocialAuth instance
 func NewSocial(urlPrefix string, socialAuther SocialAuther) *SocialAuth {
 	social := new(SocialAuth)
 	social.app = socialAuther
@@ -328,6 +340,7 @@ func NewSocial(urlPrefix string, socialAuther SocialAuther) *SocialAuth {
 	return social
 }
 
+// create a instance and create filter
 func NewWithFilter(urlPrefix string, socialAuther SocialAuther) *SocialAuth {
 	social := NewSocial(urlPrefix, socialAuther)
 

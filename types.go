@@ -20,6 +20,7 @@ import (
 	"github.com/astaxie/beego/context"
 )
 
+// Interface of social Privider
 type Provider interface {
 	GetConfig() *Config
 	GetType() SocialType
@@ -31,6 +32,7 @@ type Provider interface {
 	VerifyAccessToken(*Token) bool
 }
 
+// Interface of social utils
 type SocialAuther interface {
 	IsUserLogin(*context.Context) (int, bool)
 	LoginUser(*context.Context, int) (string, error)
