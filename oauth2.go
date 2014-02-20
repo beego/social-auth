@@ -19,10 +19,10 @@
 package social
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"mime"
 	"net/http"
 	"net/url"
 	"time"
@@ -50,7 +50,7 @@ type Token struct {
 	TokenType    string
 	Expiry       time.Time // If zero the token has no (known) expiry time.
 	RefreshToken string
-	TmpExtra     map[string]string `json:"-"` // May be nil. Temporary not saved.
+	Extra        map[string]string // May be nil.
 }
 
 func (t *Token) Expired() bool {
@@ -65,10 +65,10 @@ func (t *Token) IsEmpty() bool {
 }
 
 func (t *Token) GetExtra(key string) string {
-	if t.TmpExtra == nil {
+	if t.Extra == nil {
 		return ""
 	}
-	return t.TmpExtra[key]
+	return t.Extra[key]
 }
 
 // Transport implements http.RoundTripper. When configured with a valid
@@ -119,12 +119,17 @@ func (t *Transport) Exchange(code string) (*Token, error) {
 		tok = new(Token)
 	}
 
-	err := t.updateToken(tok, url.Values{
+	values := url.Values{
 		"grant_type":   {"authorization_code"},
 		"redirect_uri": {t.RedirectURL},
-		"scope":        {t.Scope},
 		"code":         {code},
-	})
+	}
+
+	if len(t.Scope) > 0 {
+		values.Set("scope", t.Scope)
+	}
+
+	err := t.updateToken(tok, values)
 	if err != nil {
 		return nil, err
 	}
@@ -170,6 +175,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	// This is required by the specification of http.RoundTripper.
 	req = cloneRequest(req)
 	req.Header.Set("Authorization", "Bearer "+t.AccessToken)
+	req.Header.Set("Accept", "application/json")
 
 	// Make the HTTP request.
 	return t.transport().RoundTrip(req)
@@ -219,7 +225,7 @@ func (t *Transport) updateToken(tok *Token, v url.Values) error {
 			tok.AccessToken = value
 		case "token_type":
 			tok.TokenType = value
-		case "expires_in":
+		case "expires_in", "expires":
 			d, _ := time.ParseDuration(value + "s")
 			if d == 0 {
 				tok.Expiry = time.Time{}
@@ -232,20 +238,36 @@ func (t *Transport) updateToken(tok *Token, v url.Values) error {
 				tok.RefreshToken = value
 			}
 		default:
-			if tok.TmpExtra == nil {
-				tok.TmpExtra = make(map[string]string)
+			if tok.Extra == nil {
+				tok.Extra = make(map[string]string)
 			}
-			tok.TmpExtra[k] = value
+			tok.Extra[k] = value
 		}
 	}
 
-	content, _, _ := mime.ParseMediaType(r.Header.Get("Content-Type"))
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	body = bytes.TrimSpace(body)
+
+	var content string
+
+	if body[0] == '{' {
+		content = "json"
+	}
+
 	switch content {
-	case "application/x-www-form-urlencoded", "text/plain":
-		body, err := ioutil.ReadAll(r.Body)
-		if err != nil {
+	case "json":
+		vals := make(map[string]interface{})
+		if err = json.Unmarshal(body, &vals); err != nil {
 			return err
 		}
+
+		for key, value := range vals {
+			parseValues(key, value)
+		}
+	default:
 		vals, err := url.ParseQuery(string(body))
 		if err != nil {
 			return err
@@ -253,15 +275,6 @@ func (t *Transport) updateToken(tok *Token, v url.Values) error {
 
 		for key, _ := range vals {
 			parseValues(key, vals.Get(key))
-		}
-	default:
-		vals := make(map[string]interface{})
-		if err = json.NewDecoder(r.Body).Decode(&vals); err != nil {
-			return err
-		}
-
-		for key, value := range vals {
-			parseValues(key, value)
 		}
 	}
 

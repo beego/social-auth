@@ -5,7 +5,9 @@
 		"controllers": ".",
 		"models": ".",
 		"others": [
-			"$GOPATH/src/github.com/astaxie/beego"
+			"$GOPATH/src/github.com/astaxie/beego",
+			"$GOPATH/src/github.com/beego/social-auth",
+			"$GOPATH/src/github.com/beego/social-auth/apps"
 		]
 	}
 }

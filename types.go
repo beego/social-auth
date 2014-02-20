@@ -26,10 +26,8 @@ type Provider interface {
 	GetType() SocialType
 	GetName() string
 	GetPath() string
-	GetUserInfo(*Token) (map[string]interface{}, error)
 	GetIndentify(*Token) (string, error)
 	CanConnect(*Token, *UserSocial) (bool, error)
-	VerifyAccessToken(*Token) bool
 }
 
 // Interface of social utils

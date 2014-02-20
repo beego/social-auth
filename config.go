@@ -19,11 +19,15 @@
 package social
 
 import (
+	"net/http"
 	"net/url"
 )
 
 // default redirect url
 var DefaultAppUrl = "http://127.0.0.1:8092/"
+
+// default reansport
+var DefaultTransport = http.DefaultTransport
 
 // Config is the configuration of an OAuth consumer.
 type Config struct {
@@ -72,15 +76,26 @@ func (c *Config) AuthCodeURL(state string) string {
 	if err != nil {
 		panic("AuthURL malformed: " + err.Error())
 	}
-	q := url.Values{
-		"response_type":   {"code"},
-		"client_id":       {c.ClientId},
-		"redirect_uri":    {c.RedirectURL},
-		"scope":           {c.Scope},
-		"state":           {state},
-		"access_type":     {c.AccessType},
-		"approval_prompt": {c.ApprovalPrompt},
-	}.Encode()
+	values := url.Values{
+		"response_type": {"code"},
+		"client_id":     {c.ClientId},
+		"redirect_uri":  {c.RedirectURL},
+		"state":         {state},
+	}
+
+	if len(c.Scope) > 0 {
+		values.Set("scope", c.Scope)
+	}
+
+	if len(c.AccessType) > 0 {
+		values.Set("access_type", c.AccessType)
+	}
+
+	if len(c.ApprovalPrompt) > 0 {
+		values.Set("approval_prompt", c.ApprovalPrompt)
+	}
+
+	q := values.Encode()
 	if url_.RawQuery == "" {
 		url_.RawQuery = q
 	} else {

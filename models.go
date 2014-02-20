@@ -28,10 +28,10 @@ const (
 	startType SocialType = iota
 	SocialGithub
 	SocialGoogle
-	// SocialWeibo
-	// SocialQQ
-	// SocialTwitter
-	// SocialFacebook
+	SocialWeibo
+	SocialQQ
+	SocialDropbox
+	SocialFacebook
 	endType
 )
 

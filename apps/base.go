@@ -18,7 +18,6 @@ package apps
 
 import (
 	"encoding/base64"
-	"fmt"
 
 	"github.com/astaxie/beego/orm"
 
@@ -52,18 +51,6 @@ func (p *BaseProvider) GetConfig() *social.Config {
 		AccessType:     p.AccessType,
 		ApprovalPrompt: p.ApprovalPrompt,
 	}
-}
-
-func (p *BaseProvider) GetIndentify(tok *social.Token) (string, error) {
-	infoMap, err := p.App.GetUserInfo(tok)
-	if err != nil {
-		return "", err
-	}
-
-	if infoMap["id"] == nil {
-		return "", nil
-	}
-	return fmt.Sprint(infoMap["id"]), nil
 }
 
 func (p *BaseProvider) CanConnect(tok *social.Token, userSocial *social.UserSocial) (bool, error) {

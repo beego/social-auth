@@ -2,6 +2,15 @@
 
 Social accounts connect for beego
 
+### Support Platform
+
+* Github
+* Google+
+* Sina Weibo
+* Tencent QQ
+* Dropbox
+* Facebook
+
 ### Installation
 
 ```

@@ -19,35 +19,35 @@ package apps
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 
 	"github.com/astaxie/beego/httplib"
 
 	"github.com/beego/social-auth"
 )
 
-type Google struct {
+type Facebook struct {
 	BaseProvider
 }
 
-func (p *Google) GetType() social.SocialType {
-	return social.SocialGoogle
+func (p *Facebook) GetType() social.SocialType {
+	return social.SocialFacebook
 }
 
-func (p *Google) GetName() string {
-	return "Google"
+func (p *Facebook) GetName() string {
+	return "Facebook"
 }
 
-func (p *Google) GetPath() string {
-	return "google"
+func (p *Facebook) GetPath() string {
+	return "facebook"
 }
 
-func (p *Google) GetIndentify(tok *social.Token) (string, error) {
+func (p *Facebook) GetIndentify(tok *social.Token) (string, error) {
 	vals := make(map[string]interface{})
 
-	uri := "https://www.googleapis.com/userinfo/v2/me"
+	uri := "https://graph.facebook.com/me?fields=id&access_token=" + url.QueryEscape(tok.AccessToken)
 	req := httplib.Get(uri)
 	req.SetTransport(social.DefaultTransport)
-	req.Header("Authorization", "Bearer "+tok.AccessToken)
 
 	resp, err := req.Response()
 	if err != nil {
@@ -61,6 +61,7 @@ func (p *Google) GetIndentify(tok *social.Token) (string, error) {
 	if err := decoder.Decode(&vals); err != nil {
 		return "", err
 	}
+
 	if vals["error"] != nil {
 		return "", fmt.Errorf("%v", vals["error"])
 	}
@@ -72,17 +73,17 @@ func (p *Google) GetIndentify(tok *social.Token) (string, error) {
 	return fmt.Sprint(vals["id"]), nil
 }
 
-var _ social.Provider = new(Google)
+var _ social.Provider = new(Facebook)
 
-func NewGoogle(clientId, secret string) *Google {
-	p := new(Google)
+func NewFacebook(clientId, secret string) *Facebook {
+	p := new(Facebook)
 	p.App = p
 	p.ClientId = clientId
 	p.ClientSecret = secret
-	p.Scope = "email profile https://www.googleapis.com/auth/plus.login"
-	p.AuthURL = "https://accounts.google.com/o/oauth2/auth"
-	p.TokenURL = "https://accounts.google.com/o/oauth2/token"
-	p.RedirectURL = social.DefaultAppUrl + "login/google/access"
+	p.Scope = "email"
+	p.AuthURL = "https://www.facebook.com/dialog/oauth"
+	p.TokenURL = "https://graph.facebook.com/oauth/access_token"
+	p.RedirectURL = social.DefaultAppUrl + "login/facebook/access"
 	p.AccessType = "offline"
 	p.ApprovalPrompt = "auto"
 	return p

@@ -90,15 +90,6 @@ func (this *SocialAuth) verifyState(ctx *context.Context, social SocialType) (st
 	return code, true
 }
 
-// check if uid of socialType is exist
-func (this *SocialAuth) HasConnected(uid int, social SocialType) (*UserSocial, bool) {
-	var userSocial UserSocial
-	if UserSocials().Filter("Uid", uid).Filter("Type", social).One(&userSocial) == nil {
-		return &userSocial, true
-	}
-	return nil, false
-}
-
 // Get provider according request path. ex: /login/: match /login/github
 func (this *SocialAuth) getProvider(ctx *context.Context) Provider {
 	path := ctx.Input.Param(":")
@@ -197,7 +188,7 @@ func (this *SocialAuth) OAuthAccess(ctx *context.Context) (redirect string, user
 	}
 
 	config := p.GetConfig()
-	trans := &Transport{config, nil, nil}
+	trans := &Transport{config, nil, DefaultTransport}
 
 	// Send code to platform then get token
 	if tok, err := trans.Exchange(code); err != nil {

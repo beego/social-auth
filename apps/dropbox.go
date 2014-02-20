@@ -20,38 +20,38 @@ import (
 	"github.com/beego/social-auth"
 )
 
-type Weibo struct {
+type Dropbox struct {
 	BaseProvider
 }
 
-func (p *Weibo) GetType() social.SocialType {
-	return social.SocialWeibo
+func (p *Dropbox) GetType() social.SocialType {
+	return social.SocialDropbox
 }
 
-func (p *Weibo) GetName() string {
-	return "Weibo"
+func (p *Dropbox) GetName() string {
+	return "Dropbox"
 }
 
-func (p *Weibo) GetPath() string {
-	return "weibo"
+func (p *Dropbox) GetPath() string {
+	return "dropbox"
 }
 
-func (p *Weibo) GetIndentify(tok *social.Token) (string, error) {
+func (p *Dropbox) GetIndentify(tok *social.Token) (string, error) {
 	return tok.GetExtra("uid"), nil
 }
 
-var _ social.Provider = new(Weibo)
+var _ social.Provider = new(Dropbox)
 
-func NewWeibo(clientId, secret string) *Weibo {
-	p := new(Weibo)
+func NewDropbox(clientId, secret string) *Dropbox {
+	p := new(Dropbox)
 	p.App = p
 	p.ClientId = clientId
 	p.ClientSecret = secret
-	p.Scope = "email"
-	p.AuthURL = "https://api.weibo.com/oauth2/authorize"
-	p.TokenURL = "https://api.weibo.com/oauth2/access_token"
-	p.RedirectURL = social.DefaultAppUrl + "login/weibo/access"
-	p.AccessType = "offline"
-	p.ApprovalPrompt = "auto"
+	p.Scope = ""
+	p.AuthURL = "https://www.dropbox.com/1/oauth2/authorize"
+	p.TokenURL = "https://api.dropbox.com/1/oauth2/token"
+	p.RedirectURL = social.DefaultAppUrl + "login/dropbox/access"
+	p.AccessType = ""
+	p.ApprovalPrompt = ""
 	return p
 }

@@ -163,9 +163,9 @@ func initialize() {
 	// OAuth
 	var clientId, secret string
 
-	url := beego.AppConfig.String("social_auth_url")
-	if len(url) > 0 {
-		social.DefaultAppUrl = url
+	appURL := beego.AppConfig.String("social_auth_url")
+	if len(appURL) > 0 {
+		social.DefaultAppUrl = appURL
 	}
 
 	clientId = beego.AppConfig.String("github_client_id")
@@ -182,10 +182,48 @@ func initialize() {
 		beego.Error(err)
 	}
 
+	clientId = beego.AppConfig.String("weibo_client_id")
+	secret = beego.AppConfig.String("weibo_client_secret")
+	err = social.RegisterProvider(apps.NewWeibo(clientId, secret))
+	if err != nil {
+		beego.Error(err)
+	}
+
+	clientId = beego.AppConfig.String("qq_client_id")
+	secret = beego.AppConfig.String("qq_client_secret")
+	err = social.RegisterProvider(apps.NewQQ(clientId, secret))
+	if err != nil {
+		beego.Error(err)
+	}
+
+	clientId = beego.AppConfig.String("dropbox_client_id")
+	secret = beego.AppConfig.String("dropbox_client_secret")
+	err = social.RegisterProvider(apps.NewDropbox(clientId, secret))
+	if err != nil {
+		beego.Error(err)
+	}
+
+	clientId = beego.AppConfig.String("facebook_client_id")
+	secret = beego.AppConfig.String("facebook_client_secret")
+	err = social.RegisterProvider(apps.NewFacebook(clientId, secret))
+	if err != nil {
+		beego.Error(err)
+	}
+
 	// global create a SocialAuth and auto set filter
 	SocialAuth = social.NewSocial("/login/", new(socialAuther))
 	beego.AddFilter("/login/:/access", "AfterStatic", HandleAccess)
 	beego.AddFilter("/login/:", "AfterStatic", HandleRedirect)
+
+	// set the DefaultTransport of social-auth
+	//
+	// social.DefaultTransport = &http.Transport{
+	// 	Proxy: func(req *http.Request) (*url.URL, error) {
+	// 		u, _ := url.ParseRequestURI("http://127.0.0.1:8118")
+	// 		return u, nil
+	// 	},
+	// 	DisableKeepAlives: true,
+	// }
 }
 
 func main() {

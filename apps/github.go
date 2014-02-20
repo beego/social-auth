@@ -41,34 +41,35 @@ func (p *Github) GetPath() string {
 	return "github"
 }
 
-func (p *Github) GetUserInfo(tok *social.Token) (map[string]interface{}, error) {
+func (p *Github) GetIndentify(tok *social.Token) (string, error) {
 	vals := make(map[string]interface{})
 
 	uri := "https://api.github.com/user"
 	req := httplib.Get(uri)
+	req.SetTransport(social.DefaultTransport)
 	req.Header("Authorization", "Bearer "+tok.AccessToken)
+
 	resp, err := req.Response()
 	if err != nil {
-		return vals, err
+		return "", err
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&vals); err != nil {
-		return vals, err
+	defer resp.Body.Close()
+
+	decoder := json.NewDecoder(resp.Body)
+	decoder.UseNumber()
+
+	if err := decoder.Decode(&vals); err != nil {
+		return "", err
 	}
 	if resp.StatusCode != 200 {
-		return vals, fmt.Errorf("%v", vals["message"])
+		return "", fmt.Errorf("%v", vals["message"])
 	}
 
-	return vals, nil
-}
-
-func (p *Github) VerifyAccessToken(tok *social.Token) bool {
-	uri := "https://api.github.com/applications/" + p.ClientId + "/tokens/" + tok.AccessToken
-	req := httplib.Get(uri)
-	req.Header("Authorization", p.getBasicAuth())
-	if resp, err := req.Response(); err != nil || resp.StatusCode == 404 {
-		return false
+	if vals["id"] == nil {
+		return "", nil
 	}
-	return true
+
+	return fmt.Sprint(vals["id"]), nil
 }
 
 var _ social.Provider = new(Github)
