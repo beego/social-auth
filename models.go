@@ -112,11 +112,6 @@ func (e *UserSocial) Save() (err error) {
 	return
 }
 
-func (e *UserSocial) Delete() (err error) {
-	_, err = orm.NewOrm().Delete(e)
-	return
-}
-
 func (e *UserSocial) Token() (*Token, error) {
 	return e.Data.Token, nil
 }
@@ -163,6 +158,33 @@ func (e *UserSocial) TableUnique() [][]string {
 	return [][]string{
 		{"Identify", "Type"},
 	}
+}
+func (e *UserSocial) Insert() error {
+	if _, err := orm.NewOrm().Insert(e); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *UserSocial) Read(fields ...string) error {
+	if err := orm.NewOrm().Read(e, fields...); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *UserSocial) Update(fields ...string) error {
+	if _, err := orm.NewOrm().Update(e, fields...); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (e *UserSocial) Delete() error {
+	if _, err := orm.NewOrm().Delete(e); err != nil {
+		return err
+	}
+	return nil
 }
 
 func UserSocials() orm.QuerySeter {
