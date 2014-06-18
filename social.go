@@ -335,8 +335,8 @@ func NewSocial(urlPrefix string, socialAuther SocialAuther) *SocialAuth {
 func NewWithFilter(urlPrefix string, socialAuther SocialAuther) *SocialAuth {
 	social := NewSocial(urlPrefix, socialAuther)
 
-	beego.AddFilter(social.URLPrefix+":/access", "AfterStatic", social.handleAccess)
-	beego.AddFilter(social.URLPrefix+":", "AfterStatic", social.handleRedirect)
+	beego.InsertFilter(social.URLPrefix+":/access", beego.BeforeRouter, social.handleAccess)
+	beego.InsertFilter(social.URLPrefix+":", beego.BeforeRouter, social.handleRedirect)
 
 	return social
 }

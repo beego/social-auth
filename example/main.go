@@ -24,8 +24,6 @@ import (
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/context"
 	"github.com/astaxie/beego/orm"
-
-	"github.com/beego/social-auth"
 	"github.com/beego/social-auth/apps"
 )
 
@@ -212,8 +210,8 @@ func initialize() {
 
 	// global create a SocialAuth and auto set filter
 	SocialAuth = social.NewSocial("/login/", new(socialAuther))
-	beego.AddFilter("/login/:/access", "AfterStatic", HandleAccess)
-	beego.AddFilter("/login/:", "AfterStatic", HandleRedirect)
+	beego.InsertFilter("/login/:/access", beego.BeforeRouter, HandleAccess)
+	beego.InsertFilter("/login/:", beego.BeforeRouter, HandleRedirect)
 
 	// set the DefaultTransport of social-auth
 	//
@@ -234,7 +232,7 @@ func main() {
 	beego.SessionProvider = "file"
 	beego.SessionSavePath = filepath.Join(os.TempDir(), "social_auth_sess")
 
-	beego.AddFilter("*", "BeforeRouter", func(ctx *context.Context) {
+	beego.InsertFilter("*", beego.BeforeRouter, func(ctx *context.Context) {
 		beego.Info(ctx.Request.Method, ctx.Request.RequestURI)
 	})
 
