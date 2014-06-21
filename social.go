@@ -92,7 +92,7 @@ func (this *SocialAuth) verifyState(ctx *context.Context, social SocialType) (st
 
 // Get provider according request path. ex: /login/: match /login/github
 func (this *SocialAuth) getProvider(ctx *context.Context) Provider {
-	path := ctx.Input.Param(":")
+	path := ctx.Input.Param(":splat")
 
 	p, ok := GetProviderByPath(path)
 	if ok {
@@ -335,8 +335,8 @@ func NewSocial(urlPrefix string, socialAuther SocialAuther) *SocialAuth {
 func NewWithFilter(urlPrefix string, socialAuther SocialAuther) *SocialAuth {
 	social := NewSocial(urlPrefix, socialAuther)
 
-	beego.InsertFilter(social.URLPrefix+":/access", beego.BeforeRouter, social.handleAccess)
-	beego.InsertFilter(social.URLPrefix+":", beego.BeforeRouter, social.handleRedirect)
+	beego.InsertFilter(social.URLPrefix+"*/access", beego.BeforeRouter, social.handleAccess)
+	beego.InsertFilter(social.URLPrefix+"*", beego.BeforeRouter, social.handleRedirect)
 
 	return social
 }

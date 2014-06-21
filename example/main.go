@@ -210,8 +210,8 @@ func initialize() {
 
 	// global create a SocialAuth and auto set filter
 	SocialAuth = social.NewSocial("/login/", new(socialAuther))
-	beego.InsertFilter("/login/:/access", beego.BeforeRouter, HandleAccess)
-	beego.InsertFilter("/login/:", beego.BeforeRouter, HandleRedirect)
+	beego.InsertFilter("/login/*/access", beego.BeforeRouter, HandleAccess)
+	beego.InsertFilter("/login/*", beego.BeforeRouter, HandleRedirect)
 
 	// set the DefaultTransport of social-auth
 	//
