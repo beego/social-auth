@@ -1,3 +1,3 @@
 ### example of social-auth
 
-see main.go
+see `main.go`
