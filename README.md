@@ -1,6 +1,6 @@
 # Beego social auth
 
-Social accounts connect for beego
+Connetction social accounts for beego.
 
 ### Support Platform
 
@@ -19,17 +19,17 @@ go get github.com/beego/social-auth
 
 ### Features
 
-* All use Beego
-* Support multiple social platform.
+* All use Beego.
+* Support multiple social platforms.
 * Multiple social accounts can be associated to a single user.
 
 ### Example
 
-see [example project](https://github.com/beego/social-auth/tree/master/example)
+see [example project](https://github.com/beego/social-auth/tree/master/example).
 
 Project in world:
 
-* [WeTalk](https://github.com/beego/wetalk) a beego community project
+* [WeTalk](https://github.com/beego/wetalk) a beego community project.
 
 ### Contact
 
