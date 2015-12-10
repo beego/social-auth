@@ -99,7 +99,7 @@ type UserSocial struct {
 	Uid      int              `orm:"index"`
 	Identify string           `orm:"size(200)"`
 	Type     SocialType       `orm:"index"`
-	Data     SocialTokenField ``
+	Data     SocialTokenField `orm:"null"`
 }
 
 func (e *UserSocial) Save() (err error) {
