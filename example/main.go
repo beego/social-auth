@@ -87,7 +87,7 @@ func (this *MainRouter) Home() {
 }
 
 func (this *MainRouter) Login() {
-	this.TplNames = "index.tpl"
+	this.TplName = "index.tpl"
 
 	_, isLogin := IsUserLogin(this.Ctx)
 
@@ -112,7 +112,7 @@ func (this *MainRouter) Login() {
 }
 
 func (this *MainRouter) Connect() {
-	this.TplNames = "index.tpl"
+	this.TplName = "index.tpl"
 
 	st, ok := SocialAuth.ReadyConnect(this.Ctx)
 	if !ok {
@@ -233,9 +233,9 @@ func main() {
 	initialize()
 
 	// must enable session engine, default use memory as engine
-	beego.SessionOn = true
-	beego.SessionProvider = "file"
-	beego.SessionSavePath = filepath.Join(os.TempDir(), "social_auth_sess")
+	beego.BConfig.WebConfig.Session.SessionOn = true
+	beego.BConfig.WebConfig.Session.SessionProvider = "file"
+	beego.BConfig.WebConfig.Session.SessionProviderConfig = filepath.Join(os.TempDir(), "social_auth_sess")
 
 	beego.InsertFilter("*", beego.BeforeRouter, func(ctx *context.Context) {
 		beego.Info(ctx.Request.Method, ctx.Request.RequestURI)
